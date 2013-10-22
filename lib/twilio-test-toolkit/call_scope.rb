@@ -105,6 +105,17 @@ module TwilioTestToolkit
       root_call.request_for_twiml!(path, :digits => digits, :method => gather_method, :finish_on_key => gather_finish_on_key)
     end
 
+    # Stuff for Records
+    def has_record?
+      return !(@xml.at_xpath("Record").nil?)
+    end
+
+    # Matches the specified action with action attribute on the dial element
+    def has_action_on_record?(action)
+      action_on_record = @xml.xpath("Record").attribute("action")
+      !!action_on_record && action_on_record.value == action
+    end
+
     # Some basic accessors
     def current_path
       @current_path
