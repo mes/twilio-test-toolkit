@@ -211,6 +211,8 @@ module TwilioTestToolkit
       # Post and update the scope. Options:
       # :digits - becomes params[:Digits], optional (becomes "")
       # :is_machine - becomes params[:AnsweredBy], defaults to false / human
+      # :called - becomes params[:Called], like when the REST API is used to initiate a call
+      # :direction - becomes params[:Direction]. Should be inbound, outbound-api, or outbound-dial
       def request_for_twiml!(path, options = {})
         @current_path = normalize_redirect_path(path)
 
@@ -223,7 +225,9 @@ module TwilioTestToolkit
           :Digits => formatted_digits(options[:digits].to_s, :finish_on_key => options[:finish_on_key]),
           :To => @root_call.to_number,
           :AnsweredBy => (options[:is_machine] ? "machine" : "human"),
-          :CallStatus => options.fetch(:call_status, "in-progress")
+          :CallStatus => options.fetch(:call_status, "in-progress"),
+          :Called => options.fetch(:called, ""),
+          :Direction => options[:direction].nil? ? "inbound" : options[:direction]
         )
 
         # All Twilio responses must be a success.
