@@ -3,6 +3,10 @@ require "twilio-test-toolkit/call_scope"
 module TwilioTestToolkit
   # Models a call
   class CallInProgress < CallScope
+    attr_reader :sid, :initial_path, :http_method
+    attr_reader :from_number, :to_number
+    attr_reader :is_machine, :called, :direction
+
     # Initiate a call. Options:
     # * :method - specify the http method of the initial api call
     # * :call_sid - specify an optional fixed value to be passed as params[:CallSid]
@@ -15,7 +19,7 @@ module TwilioTestToolkit
       @is_machine   = options[:is_machine]
       @called       = options[:called]
       @direction    = options[:direction]
-      @method       = options[:method] || :post
+      @http_method  = options[:method] || :post
 
       # Generate an initial call SID if we don't have one
       if (options[:call_sid].nil?)
@@ -29,35 +33,12 @@ module TwilioTestToolkit
 
       # Create the request
       request_for_twiml!(@initial_path,
-                         :method     => @method,
+                         :method     => @http_method,
                          :is_machine => @is_machine,
                          :called     => @called,
                          :direction  => @direction
                         )
     end
 
-    def sid
-      @sid
-    end
-
-    def initial_path
-      @initial_path
-    end
-
-    def from_number
-      @from_number
-    end
-
-    def to_number
-      @to_number
-    end
-
-    def is_machine
-      @is_machine
-    end
-
-    def http_method
-      @method
-    end
   end
 end
