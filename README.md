@@ -113,6 +113,8 @@ Options are:
 * **method** . Specify the http method of the initial request. By default this will be :post.
 * **call_sid**. Specify an optional fixed value to be passed as params[:CallSid]. This is useful if you are expecting a specific SID. For instance, a common pattern is to initiate a call, store the SID in your database, and look up the call when you get the callback. If you don't pass a SID, TTT will generate one for you that's just a UUID.
 * **is_machine**. Controls params[:AnsweredBy]. See Twilio's documentation for more information on how Twilio uses this.
+* **direction**. Controls params[:Direction]. Should be: inbound, outbound-api, or outbound-dial
+* **called**. Controls params[:Called]. This is present in a REST API-initiated call.
 
 *ttt_call* returns a *TwilioTestToolkit::CallInProgress* object, which is a descendent of *TwilioTestToolkit::CallScope*. You'll want to save this object as it's how you interact with TTT.
 
@@ -128,6 +130,8 @@ You can use the CallInProgress object returned from *ttt_call* to inspect some b
 	@call.from_number	# Returns the from number
 	@call.to_number		# Returns the to number
 	@call.is_machine	# Returns the answering machine state (passed to ttt_call)
+	@call.direction   # Returns the direction of the call (inbound, outbound-api, outbound-dial)
+	@call.called      # Returns the Called number in the case of an outbound-api call
 
 Call scopes
 --------------
