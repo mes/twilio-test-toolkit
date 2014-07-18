@@ -115,6 +115,7 @@ Options are:
 * **is_machine**. Controls params[:AnsweredBy]. See Twilio's documentation for more information on how Twilio uses this.
 * **direction**. Controls params[:Direction]. Should be: inbound, outbound-api, or outbound-dial
 * **called**. Controls params[:Called]. This is present in a REST API-initiated call.
+* **call_status**. Controls params[:CallStatus]. Defaults to `in-progress`. See [help article](https://www.twilio.com/help/faq/voice/what-do-the-call-statuses-mean) on call statuses.
 
 *ttt_call* returns a *TwilioTestToolkit::CallInProgress* object, which is a descendent of *TwilioTestToolkit::CallScope*. You'll want to save this object as it's how you interact with TTT.
 
