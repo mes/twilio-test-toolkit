@@ -384,5 +384,16 @@ describe TwilioTestToolkit::CallScope do
       @call.has_finish_on_key_on_record?("*").should be_true
     end
   end
-end
 
+  describe "conditional handling on call_status" do
+    it "should default to in progress" do
+      @call = ttt_call(test_call_status_twilio_index_path, @our_number, @their_number)
+      @call.should have_say "Your call is in progress."
+    end
+
+    it "should respond differently to a ringing call" do
+      @call = ttt_call(test_call_status_twilio_index_path, @our_number, @their_number, :call_status => 'ringing')
+      @call.should have_say "Your call is ringing."
+    end
+  end
+end

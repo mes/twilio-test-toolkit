@@ -1,0 +1,6 @@
+<% if @call_status == 'ringing' %>
+<Say voice="woman">Your call is ringing.</Say>
+<% else %>
+<Say voice="woman">Your call is in progress.</Say>
+<% end %>
+<Redirect><%= twilio_index_path %></Redirect>
