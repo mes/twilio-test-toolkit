@@ -83,13 +83,13 @@ module TwilioTestToolkit
       #
       # has_finish_on_key_on_record?("#")
       #
-      if meth.to_s =~ /^has_([a-zA-Z_]+)_on_([a-zA-Z]+)\?$/
-        has_attr_on_element?($2, $1, *args, &block)
+      if meth.to_s =~ /^ha(s|ve)_([a-zA-Z_]+)_on_([a-zA-Z]+)\?$/
+        has_attr_on_element?($3, $2, *args, &block)
 
       # support any check for the existence of a given element
       # with an optional check on the inner_text.
-      elsif meth.to_s =~ /^has_([a-zA-Z]+)\?$/
-        has_element?($1, *args, &block)
+      elsif meth.to_s =~ /^ha(s|ve)_([a-zA-Z]+)\?$/
+        has_element?($2, *args, &block)
 
       # get a given element node
       elsif meth.to_s =~ /^get_([a-z]+)_node$/
@@ -107,7 +107,7 @@ module TwilioTestToolkit
     end
 
     def respond_to_missing?(method_name, include_private = false)
-      method_name.to_s.match(/^(has_|get_[a-z]+_node|within_)/) || super
+      method_name.to_s.match(/^(has_|have_|get_[a-z]+_node|within_)/) || super
     end
 
     # Some basic accessors
