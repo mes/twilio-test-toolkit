@@ -12,5 +12,6 @@ Dummy::Application.routes.draw do
     post "test_say", :on => :collection
     post "test_play", :on => :collection
     post "test_record", :on => :collection
+    post "test_call_status", :on => :collection
   end
 end

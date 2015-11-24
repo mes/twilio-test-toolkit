@@ -83,13 +83,13 @@ module TwilioTestToolkit
       #
       # has_finish_on_key_on_record?("#")
       #
-      if meth.to_s =~ /^has_([a-zA-Z_]+)_on_([a-zA-Z]+)\?$/
-        has_attr_on_element?($2, $1, *args, &block)
+      if meth.to_s =~ /^ha(s|ve)_([a-zA-Z_]+)_on_([a-zA-Z]+)\?$/
+        has_attr_on_element?($3, $2, *args, &block)
 
       # support any check for the existence of a given element
       # with an optional check on the inner_text.
-      elsif meth.to_s =~ /^has_([a-zA-Z]+)\?$/
-        has_element?($1, *args, &block)
+      elsif meth.to_s =~ /^ha(s|ve)_([a-zA-Z]+)\?$/
+        has_element?($2, *args, &block)
 
       # get a given element node
       elsif meth.to_s =~ /^get_([a-z]+)_node$/
@@ -107,7 +107,7 @@ module TwilioTestToolkit
     end
 
     def respond_to_missing?(method_name, include_private = false)
-      method_name.to_s.match(/^(has_|get_[a-z]+_node|within_)/) || super
+      method_name.to_s.match(/^(has_|have_|get_[a-z]+_node|within_)/) || super
     end
 
     # Some basic accessors
@@ -211,19 +211,23 @@ module TwilioTestToolkit
       # Post and update the scope. Options:
       # :digits - becomes params[:Digits], optional (becomes "")
       # :is_machine - becomes params[:AnsweredBy], defaults to false / human
+      # :called - becomes params[:Called], like when the REST API is used to initiate a call
+      # :direction - becomes params[:Direction]. Should be inbound, outbound-api, or outbound-dial
       def request_for_twiml!(path, options = {})
         @current_path = normalize_redirect_path(path)
 
         # Post the query
         rack_test_session_wrapper = Capybara.current_session.driver
-        @response = rack_test_session_wrapper.send(options[:method] || :post, @current_path,
+        @response = rack_test_session_wrapper.send(options[:method].downcase || :post, @current_path,
           :format => :xml,
           :CallSid => @root_call.sid,
           :From => @root_call.from_number,
           :Digits => formatted_digits(options[:digits].to_s, :finish_on_key => options[:finish_on_key]),
           :To => @root_call.to_number,
           :AnsweredBy => (options[:is_machine] ? "machine" : "human"),
-          :CallStatus => options.fetch(:call_status, "in-progress")
+          :CallStatus => options.fetch(:call_status, "in-progress"),
+          :Called => options.fetch(:called, ""),
+          :Direction => options[:direction].nil? ? "inbound" : options[:direction]
         )
 
         # All Twilio responses must be a success.

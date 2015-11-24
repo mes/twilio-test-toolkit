@@ -5,4 +5,8 @@ class TwilioController < ApplicationController
   def test_action
     @digits = params[:Digits]
   end    
+
+  def test_call_status
+    @call_status = params[:CallStatus]
+  end
 end
