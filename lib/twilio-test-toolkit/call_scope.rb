@@ -154,8 +154,8 @@ module TwilioTestToolkit
           attr = camel_case_lower(attr)
         end
 
-        attr_on_el = @xml.xpath(el).attribute(attr)
-        !!attr_on_el && attr_on_el.value == value
+        attr_on_el = @xml.xpath(el).attribute(attr.to_s)
+        !!attr_on_el && attr_on_el.value == value.to_s
       end
 
       def has_element?(el, inner = nil, options = {})
