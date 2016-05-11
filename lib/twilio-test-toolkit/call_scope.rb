@@ -17,6 +17,23 @@ module TwilioTestToolkit
     # has_element "Foo", :exact_inner_match => true
     has_element "Play", :exact_inner_match => true
 
+    def has_play?(url=nil, options={})
+      el = 'Play'
+
+      return !(@xml.at_xpath(el).nil?) if url.nil?
+
+      @xml.xpath(el).each do |s|
+        url_node = s.children[0]
+        if !options[:exact_inner_match].nil? && options[:exact_inner_match] == true
+          return true if url_node.inner_text == url
+        else
+          return true if url_node.inner_text.include?(url)
+        end
+      end
+
+      return false
+    end
+
     # Stuff for redirects
     def has_redirect_to?(url)
       el = get_redirect_node
@@ -160,7 +177,12 @@ module TwilioTestToolkit
 
       def has_element?(el, inner = nil, options = {})
         el[0] = el[0,1].upcase
+
         return !(@xml.at_xpath(el).nil?) if inner.nil?
+
+        # Search for url in play objects
+        if el == 'Play'
+        end
 
         @xml.xpath(el).each do |s|
           if !options[:exact_inner_match].nil? && options[:exact_inner_match] == true
