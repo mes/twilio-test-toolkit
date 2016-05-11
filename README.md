@@ -1,6 +1,14 @@
-twilio-test-toolkit
+twilio-test-toolkit-hs
 ===================
 
+## Disclosure
+This is a fork of <a href="https://github.com/pgib/twilio-test-toolkit" target="_blank">pgib's fork</a> of the <a href="https://github.com/JMongol/twilio-test-toolkit" target="_blank">original twilio-test-toolkit</a> library by JMongol.
+
+So far the fork adds the following functionality:
+* ability to pass a `url` string to the `#has_play?` method
+
+Summary
+=====================
 Twilio Test Toolkit (TTT) makes RSpec integration tests for Twilio phone callbacks easy to write and understand.
 
 When you initiate a [phone call with Twilio](http://www.twilio.com/docs/api/rest/making-calls), you must POST either a URL or an ApplicationSid that is configured with a URL. Twilio then POSTs to your URL, and you're expected to return a 200 OK and a valid [TwiML](http://www.twilio.com/docs/api/twiml) response. That response can be any valid TwiML - speak something, gather keystrokes, redirect, etc.
