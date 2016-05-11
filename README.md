@@ -2,7 +2,7 @@ twilio-test-toolkit-hs
 ===================
 
 ## Disclosure
-This is a fork of <a href="https://github.com/pgib/twilio-test-toolkit" target="_blank">pgib's fork</a> of the <a href="https://github.com/JMongol/twilio-test-toolkit" target="_blank">original twilio-test-toolkit</a> library by JMongol.
+This is a fork of <a href="https://github.com/pgib/twilio-test-toolkit" target="_blank">pgib's fork</a> of the original <a href="https://github.com/JMongol/twilio-test-toolkit" target="_blank">twilio-test-toolkit</a> library by JMongol.
 
 So far the fork adds the following functionality:
 * ability to pass a `url` string to the `#has_play?` method
