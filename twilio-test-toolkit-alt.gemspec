@@ -5,13 +5,13 @@ require 'twilio-test-toolkit/version'
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = 'twilio-test-toolkit-alt'
+  s.name        = 'twilio-test-toolkit-hs'
   s.version     = TwilioTestToolkit::VERSION
-  s.authors     = ['Jack Nichols', 'Patrick Gibson']
+  s.authors     = ['Jack Nichols', 'Patrick Gibson', 'Ryan Guerrettaz']
   s.email       = ['jack@jmongol.com']
-  s.homepage    = 'https://github.com/pgib/twilio-test-toolkit'
+  s.homepage    = 'https://github.com/healthsherpa/twilio-test-toolkit'
   s.summary     = 'Better integration tests for apps that use Twilio'
-  s.description = 'Better integration tests for apps that use Twilio. This is an alternate version of the original JMongol version.'
+  s.description = 'Better integration tests for apps that use Twilio. This is an alternate version of the pgib forked version of the original JMongol version.'
   s.licenses = ['MIT']
 
   s.files = Dir['{app,config,db,lib}/**/*'] + ['MIT-LICENSE', 'Rakefile', 'README.md']
