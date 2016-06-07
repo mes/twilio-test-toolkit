@@ -249,7 +249,17 @@ module TwilioTestToolkit
           :AnsweredBy => (options[:is_machine] ? "machine" : "human"),
           :CallStatus => options.fetch(:call_status, "in-progress"),
           :Called => options.fetch(:called, ""),
-          :Direction => options[:direction].nil? ? "inbound" : options[:direction]
+          :Direction => options[:direction].nil? ? "inbound" : options[:direction],
+          :CallDuration => options.fetch(:call_duration, ""),
+          :RecordingDuration => options.fetch(:recording_duration, ""),
+          :ParentCallSid => options.fetch(:parent_call_sid, ""),
+          :DialCallStatus => options.fetch(:dial_call_status, ""),
+          :DialCallDuration => options.fetch(:dial_call_duration, ""),
+          :CallerName => options.fetch(:caller_name, ""),
+          :CallerState => options.fetch(:caller_state, ""),
+          :CallerCity => options.fetch(:caller_city, ""),
+          :CallerZip => options.fetch(:caller_zip, ""),
+          :RecordingUrl => options.fetch(:recording_url, "")
         )
 
         # All Twilio responses must be a success.
