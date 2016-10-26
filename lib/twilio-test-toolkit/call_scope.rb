@@ -262,6 +262,10 @@ module TwilioTestToolkit
           :RecordingUrl => options.fetch(:recording_url, ""),
           :QueueTime => options.fetch(:queue_time, ""),
           :QueueResult => options.fetch(:queue_result, ""),
+          :QueuePosition => options.fetch(:queue_position, ""),
+          :DequeingCallSid => options.fetch(:dequeueing_call_sid, ""),
+          :DequeuedCallSid => options.fetch(:dequeued_call_sid, ""),
+          :DequeueResult => options.fetch(:dequeue_result, ""),
         )
 
         # All Twilio responses must be a success.
