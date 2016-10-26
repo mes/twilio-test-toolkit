@@ -261,6 +261,7 @@ module TwilioTestToolkit
           :CallerZip => options.fetch(:caller_zip, ""),
           :RecordingUrl => options.fetch(:recording_url, ""),
           :QueueTime => options.fetch(:queue_time, ""),
+          :QueueResult => options.fetch(:queue_result, ""),
         )
 
         # All Twilio responses must be a success.
