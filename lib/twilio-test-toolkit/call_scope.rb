@@ -263,6 +263,7 @@ module TwilioTestToolkit
           :QueueTime => options.fetch(:queue_time, ""),
           :QueueResult => options.fetch(:queue_result, ""),
           :QueuePosition => options.fetch(:queue_position, ""),
+          :QueueSid => options.fetch(:queue_sid, ""),
           :DequeingCallSid => options.fetch(:dequeueing_call_sid, ""),
           :DequeuedCallSid => options.fetch(:dequeued_call_sid, ""),
           :DequeueResult => options.fetch(:dequeue_result, ""),
