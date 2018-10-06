@@ -143,7 +143,7 @@ module TwilioTestToolkit
     private
       def formatted_digits(digits, options = {})
         if digits.nil?
-          ''
+          nil
         elsif options[:finish_on_key]
           digits.to_s.split(options[:finish_on_key])[0]
         else
@@ -244,7 +244,7 @@ module TwilioTestToolkit
           :format => :xml,
           :CallSid => @root_call.sid,
           :From => @root_call.from_number,
-          :Digits => formatted_digits(options[:digits].to_s, :finish_on_key => options[:finish_on_key]),
+          :Digits => formatted_digits(options[:digits], :finish_on_key => options[:finish_on_key]),
           :To => @root_call.to_number,
           :AnsweredBy => (options[:is_machine] ? "machine" : "human"),
           :CallStatus => options.fetch(:call_status, "in-progress"),

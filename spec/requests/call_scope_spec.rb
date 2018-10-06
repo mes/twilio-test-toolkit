@@ -87,7 +87,6 @@ describe TwilioTestToolkit::CallScope, type: :request do
         default_request_params = {
           :format => :xml,
           :From => "2065551212",
-          :Digits => "",
           :To => "2065553434",
           :AnsweredBy => "human",
           :CallStatus => "in-progress"
