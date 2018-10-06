@@ -240,7 +240,9 @@ module TwilioTestToolkit
 
         # Post the query
         rack_test_session_wrapper = Capybara.current_session.driver
-        @response = rack_test_session_wrapper.send(options[:method].downcase || :post, @current_path,
+        @response = rack_test_session_wrapper.send(
+          options[:method].try(:downcase) || :post,
+          @current_path,
           :format => :xml,
           :CallSid => @root_call.sid,
           :From => @root_call.from_number,
