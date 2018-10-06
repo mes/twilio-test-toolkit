@@ -259,6 +259,7 @@ module TwilioTestToolkit
           :CallerState => options.fetch(:caller_state, ""),
           :CallerCity => options.fetch(:caller_city, ""),
           :CallerZip => options.fetch(:caller_zip, ""),
+          :CallerCountry => options.fetch(:caller_country, ""),
           :RecordingUrl => options.fetch(:recording_url, ""),
           :QueueTime => options.fetch(:queue_time, ""),
           :QueueResult => options.fetch(:queue_result, ""),
