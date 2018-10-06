@@ -6,29 +6,29 @@ describe TwilioTestToolkit::DSL do
     @their_number = "2065553434"
   end
 
-  describe "ttt_call" do
+  describe "ttt_call", type: :request do
     describe "basics" do
       before(:each) do
         @call = ttt_call(test_start_twilio_index_path, @our_number, @their_number)
       end
 
       it "should assign the call" do
-        @call.should_not be_nil
+        expect(@call).not_to be_nil
       end
 
       it "should have a sid" do
-        @call.sid.should_not be_blank
+        expect(@call.sid).not_to be_blank
       end
 
       it "should default the method to post" do
-        @call.http_method.should == :post
+        expect(@call.http_method).to eq(:post)
       end
 
       it "should have the right properties" do
-        @call.initial_path.should == test_start_twilio_index_path
-        @call.from_number.should == @our_number
-        @call.to_number.should == @their_number
-        @call.is_machine.should be_false
+        expect(@call.initial_path).to eq(test_start_twilio_index_path)
+        expect(@call.from_number).to eq(@our_number)
+        expect(@call.to_number).to eq(@their_number)
+        expect(@call.is_machine).to be_falsey
       end
     end
 
@@ -39,15 +39,15 @@ describe TwilioTestToolkit::DSL do
       end
 
       it "should have the right sid" do
-        @call.sid.should == @mysid
+        expect(@call.sid).to eq(@mysid)
       end
 
       it "should be a machine call" do
-        @call.is_machine.should be_true
+        expect(@call.is_machine).to be_truthy
       end
 
       it "should be a get call" do
-        @call.http_method.should == :get
+        expect(@call.http_method).to eq(:get)
       end
     end
 
@@ -58,11 +58,11 @@ describe TwilioTestToolkit::DSL do
       end
 
       it "should have the right direction" do
-        @call.direction.should == @direction
+        expect(@call.direction).to eq(@direction)
       end
 
       it "should have the right called number" do
-        @call.called.should == @their_number
+        expect(@call.called).to eq(@their_number)
       end
     end
   end

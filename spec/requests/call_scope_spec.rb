@@ -1,6 +1,8 @@
 require 'spec_helper'
 
-describe TwilioTestToolkit::CallScope do
+include Rails.application.routes.url_helpers
+
+describe TwilioTestToolkit::CallScope, type: :request do
   before(:each) do
     @our_number = "2065551212"
     @their_number = "2065553434"
@@ -12,25 +14,25 @@ describe TwilioTestToolkit::CallScope do
     end
 
     it "should be a CallScope" do
-      @call.should be_a(TwilioTestToolkit::CallScope)
+      expect(@call).to be_a(TwilioTestToolkit::CallScope)
     end
 
     it "should have the informational methods" do
-      @call.should respond_to(:current_path)
-      @call.should respond_to(:response_xml)
+      expect(@call).to respond_to(:current_path)
+      expect(@call).to respond_to(:response_xml)
     end
 
     it "should have the right path" do
-      @call.current_path.should == test_start_twilio_index_path
+      expect(@call.current_path).to eq(test_start_twilio_index_path)
     end
 
     it "should have a response xml value" do
-      @call.response_xml.should_not be_blank
+      expect(@call.response_xml).not_to be_blank
     end
 
     it "should have the right root call" do
-      @call.should respond_to(:root_call)
-      @call.root_call.should == @call
+      expect(@call).to respond_to(:root_call)
+      expect(@call.root_call).to eq(@call)
     end
   end
 
@@ -41,20 +43,20 @@ describe TwilioTestToolkit::CallScope do
       end
 
       it "should have the redirect methods" do
-        @call.should respond_to(:has_redirect?)
-        @call.should respond_to(:has_redirect_to?)
-        @call.should respond_to(:follow_redirect)
-        @call.should respond_to(:follow_redirect!)
+        expect(@call).to respond_to(:has_redirect?)
+        expect(@call).to respond_to(:has_redirect_to?)
+        expect(@call).to respond_to(:follow_redirect)
+        expect(@call).to respond_to(:follow_redirect!)
       end
 
       it "should have the right value for has_redirect?" do
-        @call.should have_redirect
+        expect(@call).to have_redirect
       end
 
       it "should have the right values for has_redirect_to?" do
-        @call.has_redirect_to?("http://foo").should be_false
-        @call.has_redirect_to?(test_start_twilio_index_path).should be_true
-        @call.has_redirect_to?(test_start_twilio_index_path + ".xml").should be_true    # Should force normalization
+        expect(@call.has_redirect_to?("http://foo")).to be_falsey
+        expect(@call.has_redirect_to?(test_start_twilio_index_path)).to be_truthy
+        expect(@call.has_redirect_to?(test_start_twilio_index_path + ".xml")).to be_truthy    # Should force normalization
       end
 
       it "should follow the redirect (immutable version)" do
@@ -62,15 +64,15 @@ describe TwilioTestToolkit::CallScope do
         newcall = @call.follow_redirect
 
         # Make sure it followed
-        newcall.current_path.should == test_start_twilio_index_path
+        expect(newcall.current_path).to eq(test_start_twilio_index_path)
 
         # And is not the same call
-        newcall.response_xml.should_not == @call.response_xml
+        expect(newcall.response_xml).not_to eq(@call.response_xml)
         # But it's linked
-        newcall.root_call.should == @call
+        expect(newcall.root_call).to eq(@call)
 
         # And we did not modify the original call
-        @call.current_path.should == test_redirect_twilio_index_path
+        expect(@call.current_path).to eq(test_redirect_twilio_index_path)
       end
 
       it "should follow the redirect (mutable version)" do
@@ -78,7 +80,7 @@ describe TwilioTestToolkit::CallScope do
         @call.follow_redirect!
 
         # Make sure it followed
-        @call.current_path.should == test_start_twilio_index_path
+        expect(@call.current_path).to eq(test_start_twilio_index_path)
       end
 
       it "should submit default params on follow_redirect" do
@@ -90,8 +92,8 @@ describe TwilioTestToolkit::CallScope do
           :AnsweredBy => "human",
           :CallStatus => "in-progress"
         }
-        Capybara.current_session.driver
-          .should_receive(:post)
+        expect(Capybara.current_session.driver)
+          .to receive(:post)
           .with("/twilio/test_start", hash_including(default_request_params))
           .and_call_original
 
@@ -99,8 +101,8 @@ describe TwilioTestToolkit::CallScope do
       end
 
       it "should consider options for follow_redirect!" do
-        Capybara.current_session.driver
-          .should_receive(:post)
+        expect(Capybara.current_session.driver)
+          .to receive(:post)
           .with("/twilio/test_start", hash_including(:CallStatus => "completed"))
           .and_call_original
 
@@ -108,8 +110,8 @@ describe TwilioTestToolkit::CallScope do
       end
 
       it "should consider options for follow_redirect" do
-        Capybara.current_session.driver
-          .should_receive(:post)
+        expect(Capybara.current_session.driver)
+          .to receive(:post)
           .with("/twilio/test_start", hash_including(:CallStatus => "completed"))
           .and_call_original
 
@@ -124,21 +126,21 @@ describe TwilioTestToolkit::CallScope do
       end
 
       it "should have the right value for has_redirect?" do
-        @call.should_not have_redirect
+        expect(@call).not_to have_redirect
       end
 
       it "should have the right values for has_redirect_to?" do
-        @call.has_redirect_to?("http://foo").should be_false
-        @call.has_redirect_to?(test_start_twilio_index_path).should be_false
-        @call.has_redirect_to?(test_start_twilio_index_path + ".xml").should be_false
+        expect(@call.has_redirect_to?("http://foo")).to be_falsey
+        expect(@call.has_redirect_to?(test_start_twilio_index_path)).to be_falsey
+        expect(@call.has_redirect_to?(test_start_twilio_index_path + ".xml")).to be_falsey
       end
 
       it "should raise an error on follow_redirect" do
-        lambda {@call.follow_redirect}.should raise_error
+        expect {@call.follow_redirect}.to raise_error 'No redirect'
       end
 
       it "should raise an error on follow_redirect!" do
-        lambda {@call.follow_redirect!}.should raise_error
+        expect {@call.follow_redirect!}.to raise_error 'No redirect'
       end
     end
   end
@@ -149,13 +151,13 @@ describe TwilioTestToolkit::CallScope do
     end
 
     it "should have the expected say methods" do
-      @call.should respond_to(:has_say?)
+      expect(@call).to respond_to(:has_say?)
     end
 
     it "should have the right values for has_say?" do
-      @call.has_say?("Blah blah").should be_false
-      @call.has_say?("This is a say page.").should be_true
-      @call.has_say?("This is").should be_true      # Partial match
+      expect(@call.has_say?("Blah blah")).to be_falsey
+      expect(@call.has_say?("This is a say page.")).to be_truthy
+      expect(@call.has_say?("This is")).to be_truthy      # Partial match
     end
   end
 
@@ -165,7 +167,7 @@ describe TwilioTestToolkit::CallScope do
     end
 
     it "should have the expected say play methods" do
-      @call.should respond_to(:has_play?)
+      expect(@call).to respond_to(:has_play?)
     end
 
     it "should have the right values for has_say?" do
@@ -181,37 +183,37 @@ describe TwilioTestToolkit::CallScope do
     end
 
     it "should have the expected dial methods" do
-      @call.should respond_to(:has_dial?)
+      expect(@call).to respond_to(:has_dial?)
     end
 
     it "should have the right values for has_dial?" do
-      @call.has_dial?("911").should be_false
-      @call.has_dial?("18001234567").should be_true
-      @call.has_dial?("12345").should be_true     # Partial match
+      expect(@call.has_dial?("911")).to be_falsey
+      expect(@call.has_dial?("18001234567")).to be_truthy
+      expect(@call.has_dial?("12345")).to be_truthy     # Partial match
     end
 
     it "should not match the dial action if there isn't one" do
       @call = ttt_call(test_dial_with_no_action_twilio_index_path, @our_number, @their_number)
 
-      @call.has_action_on_dial?("http://example.org:3000/call_me_back").should eq false
+      expect(@call.has_action_on_dial?("http://example.org:3000/call_me_back")).to eq false
     end
 
     it "should match the action on dial if there is one" do
-      @call.has_action_on_dial?("http://example.org:3000/call_me_back").should be_true
+      expect(@call.has_action_on_dial?("http://example.org:3000/call_me_back")).to be_truthy
     end
 
     it "should not match the action on dial if it's different than the one specified" do
-      @call.has_action_on_dial?("http://example.org:3000/dont_call").should be_false
+      expect(@call.has_action_on_dial?("http://example.org:3000/dont_call")).to be_falsey
     end
 
     it "should dial a sip peer with the correct structure" do
       @call = ttt_call(test_dial_with_sip_twilio_index_path, @our_number, @their_number)
       @call.within_dial do |dial|
-        dial.has_sip?.should be_true
+        expect(dial.has_sip?).to be_truthy
         dial.within_sip do |sip|
-          sip.has_uri?("18885551234@sip.foo.bar").should be_true
-          sip.has_username_on_uri?("foo").should be_true
-          sip.has_password_on_uri?("bar").should be_true
+          expect(sip.has_uri?("18885551234@sip.foo.bar")).to be_truthy
+          expect(sip.has_username_on_uri?("foo")).to be_truthy
+          expect(sip.has_password_on_uri?("bar")).to be_truthy
         end
       end
     end
@@ -224,11 +226,11 @@ describe TwilioTestToolkit::CallScope do
       end
 
       it "should have the expected hangup methods" do
-        @call.should respond_to(:has_hangup?)
+        expect(@call).to respond_to(:has_hangup?)
       end
 
       it "should have the right value for has_hangup?" do
-        @call.should have_hangup
+        expect(@call).to have_hangup
       end
     end
 
@@ -238,7 +240,7 @@ describe TwilioTestToolkit::CallScope do
       end
 
       it "should have the right value for has_hangup?" do
-        @call.should_not have_hangup
+        expect(@call).not_to have_hangup
       end
     end
   end
@@ -250,53 +252,53 @@ describe TwilioTestToolkit::CallScope do
       end
 
       it "should have the expected gather methods" do
-        @call.should respond_to(:has_gather?)
-        @call.should respond_to(:within_gather)
-        @call.should respond_to(:gather?)
-        @call.should respond_to(:gather_action)
-        @call.should respond_to(:press)
+        expect(@call).to respond_to(:has_gather?)
+        expect(@call).to respond_to(:within_gather)
+        expect(@call).to respond_to(:gather?)
+        expect(@call).to respond_to(:gather_action)
+        expect(@call).to respond_to(:press)
       end
 
       it "should have the right value for has_gather?" do
-        @call.has_gather?.should be_true
+        expect(@call.has_gather?).to be_truthy
       end
 
       it "should have the right value for gather?" do
         # Although we have a gather, the current call scope is not itself a gather, so this returns false.
-        @call.gather?.should be_false
+        expect(@call.gather?).to be_falsey
       end
 
       it "should fail on gather-scoped methods outside of a gather scope" do
-        lambda {@call.gather_action}.should raise_error
-        lambda {@call.press "1234"}.should raise_error
+        expect {@call.gather_action}.to raise_error 'Not a gather'
+        expect {@call.press "1234"}.to raise_error 'Not a gather'
       end
 
       it "should gather" do
         # We should not have a say that's contained within a gather.
-        @call.should_not have_say("Please enter some digits.")
+        expect(@call).not_to have_say("Please enter some digits.")
 
         # Now enter the gather block.
         @call.within_gather do |gather|
           # We should have a say here
-          gather.should have_say("Please enter some digits.")
+          expect(gather).to have_say("Please enter some digits.")
 
           # We should be in a gather
-          gather.gather?.should be_true
+          expect(gather.gather?).to be_truthy
           # And we should have an action
-          gather.gather_action.should == test_action_twilio_index_path
+          expect(gather.gather_action).to eq(test_action_twilio_index_path)
 
           # And we should have the right root call
-          gather.root_call.should == @call
+          expect(gather.root_call).to eq(@call)
 
           # Press some digits.
           gather.press "98765"
         end
 
         # This should update the path
-        @call.current_path.should == test_action_twilio_index_path
+        expect(@call.current_path).to eq(test_action_twilio_index_path)
 
         # This view says the digits we pressed - make sure
-        @call.should have_say "You entered 98765."
+        expect(@call).to have_say "You entered 98765."
       end
 
       it "should gather without a press" do
@@ -305,14 +307,14 @@ describe TwilioTestToolkit::CallScope do
         end
 
         # We should still be on the same page
-        @call.current_path.should == test_start_twilio_index_path
+        expect(@call.current_path).to eq(test_start_twilio_index_path)
       end
 
       it "should respond to the default finish key of hash" do
         @call.within_gather do |gather|
           gather.press "98765#"
         end
-        @call.should have_say "You entered 98765."
+        expect(@call).to have_say "You entered 98765."
       end
     end
 
@@ -326,7 +328,7 @@ describe TwilioTestToolkit::CallScope do
           gather.press "98765*"
         end
 
-        @call.should have_say "You entered 98765."
+        expect(@call).to have_say "You entered 98765."
       end
 
       it "should still accept the digits without a finish key (due to timeout)" do
@@ -334,7 +336,7 @@ describe TwilioTestToolkit::CallScope do
           gather.press "98765"
         end
 
-        @call.should have_say "You entered 98765."
+        expect(@call).to have_say "You entered 98765."
       end
 
     end
@@ -345,20 +347,20 @@ describe TwilioTestToolkit::CallScope do
       end
 
       it "should have the right value for has_gather?" do
-        @call.has_gather?.should be_false
+        expect(@call.has_gather?).to be_falsey
       end
 
       it "should have the right value for gather?" do
-        @call.gather?.should be_false
+        expect(@call.gather?).to be_falsey
       end
 
       it "should fail on within_gather if there is no gather" do
-        lambda {@call.within_gather do |gather|; end}.should raise_error
+        expect {@call.within_gather do |gather|; end}.to raise_error 'No el in scope'
       end
 
       it "should fail on gather-scoped methods outside of a gather scope" do
-        lambda {@call.gather_action}.should raise_error
-        lambda {@call.press "1234"}.should raise_error
+        expect {@call.gather_action}.to raise_error 'Not a gather'
+        expect {@call.press "1234"}.to raise_error 'Not a gather'
       end
     end
   end
@@ -369,32 +371,32 @@ describe TwilioTestToolkit::CallScope do
     end
 
     it "should have the expected say record methods" do
-      @call.should respond_to(:has_record?)
+      expect(@call).to respond_to(:has_record?)
     end
 
     it "should have the right action for record"  do
-      @call.has_action_on_record?("http://example.org:3000/record_this_call").should be_true
+      expect(@call.has_action_on_record?("http://example.org:3000/record_this_call")).to be_truthy
     end
 
     it "should have the right maxLength for record"  do
-      @call.has_max_length_on_record?("20").should be_true
-      @call.has_max_length_on_record?(20).should be_true
+      expect(@call.has_max_length_on_record?("20")).to be_truthy
+      expect(@call.has_max_length_on_record?(20)).to be_truthy
     end
 
     it "should have the right finishOnKey for record"  do
-      @call.has_finish_on_key_on_record?("*").should be_true
+      expect(@call.has_finish_on_key_on_record?("*")).to be_truthy
     end
   end
 
   describe "conditional handling on call_status" do
     it "should default to in progress" do
       @call = ttt_call(test_call_status_twilio_index_path, @our_number, @their_number)
-      @call.should have_say "Your call is in progress."
+      expect(@call).to have_say "Your call is in progress."
     end
 
     it "should respond differently to a ringing call" do
       @call = ttt_call(test_call_status_twilio_index_path, @our_number, @their_number, :call_status => 'ringing')
-      @call.should have_say "Your call is ringing."
+      expect(@call).to have_say "Your call is ringing."
     end
   end
 end
