@@ -7,6 +7,15 @@ describe TwilioTestToolkit::CallScope, type: :request do
     @our_number = "2065551212"
     @their_number = "2065553434"
   end
+  let(:default_request_params) do
+    {
+      :format => :xml,
+      :From => "2065551212",
+      :To => "2065553434",
+      :AnsweredBy => "human",
+      :CallStatus => "in-progress"
+    }
+  end
 
   describe "basics" do
     before(:each) do
@@ -84,13 +93,6 @@ describe TwilioTestToolkit::CallScope, type: :request do
       end
 
       it "should submit default params on follow_redirect" do
-        default_request_params = {
-          :format => :xml,
-          :From => "2065551212",
-          :To => "2065553434",
-          :AnsweredBy => "human",
-          :CallStatus => "in-progress"
-        }
         expect(Capybara.current_session.driver)
           .to receive(:post)
           .with("/twilio/test_start", hash_including(default_request_params))
@@ -265,6 +267,8 @@ describe TwilioTestToolkit::CallScope, type: :request do
         expect(@call).to respond_to(:gather?)
         expect(@call).to respond_to(:gather_action)
         expect(@call).to respond_to(:press)
+        expect(@call).to respond_to(:speak)
+        expect(@call).to respond_to(:speak_partially)
       end
 
       it "should have the right value for has_gather?" do
@@ -279,74 +283,141 @@ describe TwilioTestToolkit::CallScope, type: :request do
       it "should fail on gather-scoped methods outside of a gather scope" do
         expect {@call.gather_action}.to raise_error 'Not a gather'
         expect {@call.press "1234"}.to raise_error 'Not a gather'
+        expect {@call.speak "1234"}.to raise_error 'Not a gather'
+        expect {@call.speak_partially "12","34"}.to raise_error 'Not a gather'
       end
 
-      it "should gather" do
-        # We should not have a say that's contained within a gather.
-        expect(@call).not_to have_say("Please enter some digits.")
+      describe "gathering DTMF" do
+        it "should gather" do
+          # We should not have a say that's contained within a gather.
+          expect(@call).not_to have_say("Please enter some digits.")
 
-        # Now enter the gather block.
-        @call.within_gather do |gather|
-          # We should have a say here
-          expect(gather).to have_say("Please enter some digits.")
+          # Now enter the gather block.
+          @call.within_gather do |gather|
+            # We should have a say here
+            expect(gather).to have_say("Please enter some digits.")
 
-          # We should be in a gather
-          expect(gather.gather?).to be_truthy
-          # And we should have an action
-          expect(gather.gather_action).to eq(test_action_twilio_index_path)
+            # We should be in a gather
+            expect(gather.gather?).to be_truthy
+            # And we should have an action
+            expect(gather.gather_action).to eq(test_action_twilio_index_path)
 
-          # And we should have the right root call
-          expect(gather.root_call).to eq(@call)
+            # And we should have the right root call
+            expect(gather.root_call).to eq(@call)
 
-          # Press some digits.
-          gather.press "98765"
+            # Press some digits.
+            gather.press "98765"
+          end
+
+          # This should update the path
+          expect(@call.current_path).to eq(test_action_twilio_index_path)
+
+          # This view says the digits we pressed - make sure
+          expect(@call).to have_say "You entered 98765."
         end
 
-        # This should update the path
-        expect(@call.current_path).to eq(test_action_twilio_index_path)
+        it "should gather without a press" do
+          @call.within_gather do |gather|
+            # Do nothing
+          end
 
-        # This view says the digits we pressed - make sure
-        expect(@call).to have_say "You entered 98765."
-      end
-
-      it "should gather without a press" do
-        @call.within_gather do |gather|
-          # Do nothing
+          # We should still be on the same page
+          expect(@call.current_path).to eq(test_start_twilio_index_path)
         end
 
-        # We should still be on the same page
-        expect(@call.current_path).to eq(test_start_twilio_index_path)
-      end
-
-      it "should respond to the default finish key of hash" do
-        @call.within_gather do |gather|
-          gather.press "98765#"
-        end
-        expect(@call).to have_say "You entered 98765."
-      end
-    end
-
-    describe "with finishOnKey specified" do
-      before(:each) do
-        @call = ttt_call(test_gather_finish_on_asterisk_twilio_index_path, @our_number, @their_number)
-      end
-
-      it "should strip the finish key from the digits" do
-        @call.within_gather do |gather|
-          gather.press "98765*"
+        it "should respond to the default finish key of hash" do
+          @call.within_gather do |gather|
+            gather.press "98765#"
+          end
+          expect(@call).to have_say "You entered 98765."
         end
 
-        expect(@call).to have_say "You entered 98765."
-      end
+        describe "with finishOnKey specified" do
+          before(:each) do
+            @call = ttt_call(test_gather_finish_on_asterisk_twilio_index_path, @our_number, @their_number)
+          end
 
-      it "should still accept the digits without a finish key (due to timeout)" do
-        @call.within_gather do |gather|
-          gather.press "98765"
+          it "should strip the finish key from the digits" do
+            @call.within_gather do |gather|
+              gather.press "98765*"
+            end
+
+            expect(@call).to have_say "You entered 98765."
+          end
+
+          it "should still accept the digits without a finish key (due to timeout)" do
+            @call.within_gather do |gather|
+              gather.press "98765"
+            end
+
+            expect(@call).to have_say "You entered 98765."
+          end
         end
-
-        expect(@call).to have_say "You entered 98765."
       end
+      describe "gathering speech" do
+        it "should gather" do
+          # We should not have a say that's contained within a gather.
+          expect(@call).not_to have_say("Please enter some digits.")
 
+          # Now enter the gather block.
+          @call.within_gather do |gather|
+            # We should have a say here
+            expect(gather).to have_say("Please enter some digits.")
+
+            # We should be in a gather
+            expect(gather.gather?).to be_truthy
+            # And we should have an action
+            expect(gather.gather_action).to eq(test_action_twilio_index_path)
+
+            # And we should have the right root call
+            expect(gather.root_call).to eq(@call)
+
+            # Press some digits.
+            gather.speak "98765"
+          end
+
+          # This should update the path
+          expect(@call.current_path).to eq(test_action_twilio_index_path)
+
+          # This view says the digits we pressed - make sure
+          expect(@call).to have_say "You entered 98765."
+        end
+        it 'should post partial input' do
+
+          # We should not have a say that's contained within a gather.
+          expect(@call).not_to have_say('Please enter some digits.')
+
+          # Now enter the gather block.
+          @call.within_gather do |gather|
+            # We should have a say here
+            expect(gather).to have_say('Please enter some digits.')
+
+            # We should be in a gather
+            expect(gather.gather?).to be_truthy
+            # And we should have an action
+            expect(gather.gather_action).to eq(test_action_twilio_index_path)
+
+            # And we should have the right root call
+            expect(gather.root_call).to eq(@call)
+
+            expect(Capybara.current_session.driver)
+              .to receive(:post)
+              .with(
+                "/twilio/test_partial_result_callback",
+                hash_including(
+                  default_request_params.merge(
+                    StableSpeechResult: '987',
+                    UnstableSpeechResult: '65'
+                  )
+                )
+              )
+              .and_call_original
+
+            # Press some digits.
+            gather.speak_partially '987', '65'
+          end
+        end
+      end
     end
 
     describe "failure" do

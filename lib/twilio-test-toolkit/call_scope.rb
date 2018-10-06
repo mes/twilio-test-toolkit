@@ -75,6 +75,16 @@ module TwilioTestToolkit
       return @xml["finishOnKey"] || '#' # '#' is the default finish key if not specified
     end
 
+    def gather_partial_result_callback
+      raise "Not a gather" unless gather?
+      return @xml["partialResultCallback"]
+    end
+
+    def gather_partial_result_callback_method
+      raise "Not a gather" unless gather?
+      return @xml["partialResultCallbackMethod"]
+    end
+
     def press(digits)
       raise "Not a gather" unless gather?
 
@@ -83,6 +93,31 @@ module TwilioTestToolkit
 
       # Update the root call
       root_call.request_for_twiml!(path, :digits => digits, :method => gather_method, :finish_on_key => gather_finish_on_key)
+    end
+
+    def speak(text)
+      raise "Not a gather" unless gather?
+
+      # Fetch the path and then post
+      path = gather_action
+
+      # Update the root call
+      root_call.request_for_twiml!(path, :speech_result => text, :method => gather_method)
+    end
+
+    def speak_partially(stable_speech_result, unstable_speech_result)
+      raise "Not a gather" unless gather?
+
+      # Fetch the path and then post
+      path = gather_partial_result_callback
+      method = gather_partial_result_callback_method
+
+      root_call.callback_request(
+        path,
+        method: method,
+        stable_speech_result: stable_speech_result,
+        unstable_speech_result: unstable_speech_result
+      )
     end
 
     # Make this easier to support TwiML elements...
@@ -243,6 +278,41 @@ module TwilioTestToolkit
         @response = rack_test_session_wrapper.send(
           options[:method].try(:downcase) || :post,
           @current_path,
+          translate_request_options(options)
+        )
+
+        # All Twilio responses must be a success.
+        raise "Bad response: #{@response.status}" unless @response.status == 200
+
+        # Load the xml
+        data = @response.body
+        @response_xml = Nokogiri::XML.parse(data)
+        set_xml(@response_xml.at_xpath("Response"))
+      end
+
+      # Post to a non-TwiML endpoint, leaving the scope intact. Options:
+      # :method
+      # :StableSpeechResult
+      # :UnstableSpeechResult
+      def callback_request(path, options = {})
+        @current_path = normalize_redirect_path(path)
+
+        # Post the query
+        rack_test_session_wrapper = Capybara.current_session.driver
+        @response = rack_test_session_wrapper.send(
+          options[:method].try(:downcase) || :post,
+          @current_path,
+          translate_request_options(options)
+        )
+
+        # All Twilio responses must be a success.
+        raise "Bad response: #{@response.status}" unless @response.status == 200
+
+        # Ignore the response otherwise
+      end
+
+      def translate_request_options(options)
+        {
           :format => :xml,
           :CallSid => @root_call.sid,
           :From => @root_call.from_number,
@@ -270,15 +340,10 @@ module TwilioTestToolkit
           :DequeingCallSid => options.fetch(:dequeueing_call_sid, ""),
           :DequeuedCallSid => options.fetch(:dequeued_call_sid, ""),
           :DequeueResult => options.fetch(:dequeue_result, ""),
-        )
-
-        # All Twilio responses must be a success.
-        raise "Bad response: #{@response.status}" unless @response.status == 200
-
-        # Load the xml
-        data = @response.body
-        @response_xml = Nokogiri::XML.parse(data)
-        set_xml(@response_xml.at_xpath("Response"))
+          :SpeechResult => options.fetch(:speech_result, nil),
+          :StableSpeechResult => options.fetch(:stable_speech_result, nil),
+          :UnstableSpeechResult => options.fetch(:unstable_speech_result, nil),
+        }
       end
 
       # Parent call control

@@ -1,5 +1,5 @@
 <Say voice="woman">Hi there.</Say>
 
-<Gather action="<%= test_action_twilio_index_path %>" method="post">
+<Gather action="<%= test_action_twilio_index_path %>" method="post" input="dtmf speech" partialResultCallback="<%= test_partial_result_callback_twilio_index_path %>">
 	<Say>Please enter some digits.</Say>
 </Gather>
