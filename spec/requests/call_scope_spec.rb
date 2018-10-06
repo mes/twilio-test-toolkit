@@ -170,10 +170,19 @@ describe TwilioTestToolkit::CallScope, type: :request do
       expect(@call).to respond_to(:has_play?)
     end
 
-    it "should have the right values for has_say?" do
-      @call.has_play?("/path/to/a/different/audio/clip.mp3").should be_false
-      @call.has_play?("/path/to/an/audio/clip.mp3").should be_true
-      @call.has_play?("clip.mp3").should be_false
+    context 'when exact_inner_match is not set' do
+      it "should have the right values for has_say?" do
+        expect(@call.has_play?("/path/to/a/different/audio/clip.mp3")).to be_falsey
+        expect(@call.has_play?("/path/to/an/audio/clip.mp3")).to be_truthy
+        expect(@call.has_play?("clip.mp3")).to be_truthy
+      end
+    end
+    context 'when exact_inner_match is set' do
+      it "should have the right values for has_say?" do
+        expect(@call.has_play?("/path/to/a/different/audio/clip.mp3", exact_inner_match: true)).to be_falsey
+        expect(@call.has_play?("/path/to/an/audio/clip.mp3", exact_inner_match: true)).to be_truthy
+        expect(@call.has_play?("clip.mp3", exact_inner_match: true)).to be_falsey
+      end
     end
   end
 
