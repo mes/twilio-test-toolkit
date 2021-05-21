@@ -178,12 +178,19 @@ module TwilioTestToolkit
     private
       def formatted_digits(digits, options = {})
         if digits.nil?
-          nil
+          get_from_url('Digit')
         elsif options[:finish_on_key]
           digits.to_s.split(options[:finish_on_key])[0]
         else
           digits
         end
+      end
+
+      def get_from_url(parameter)
+        return unless @root_call
+        uri = URI.parse(@root_call.current_path)
+        return unless uri.query
+        CGI.parse(uri.query)[parameter].first
       end
 
       def get_element_node(el)
