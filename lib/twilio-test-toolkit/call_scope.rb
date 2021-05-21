@@ -178,7 +178,7 @@ module TwilioTestToolkit
     private
       def formatted_digits(digits, options = {})
         if digits.nil?
-          get_from_url('Digit')
+          get_from_url('Digits')
         elsif options[:finish_on_key]
           digits.to_s.split(options[:finish_on_key])[0]
         else
